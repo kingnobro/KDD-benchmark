@@ -34,3 +34,4 @@ PAPERIDAUTHORID_TO_NAME_AND_AFFILIATION_FILE = os.path.join(DATASET_PATH,
                                                             "paperIdAuthorId_to_name_and_affiliation.json")
 PAPERAUTHOR_FILE = os.path.join(DATASET_PATH, "PaperAuthor.csv")
 AUTHOR_FILE = os.path.join(DATASET_PATH, "Author.csv")
+PAPER_FILE = os.path.join(DATASET_PATH, "Paper.csv")

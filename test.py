@@ -1,21 +1,22 @@
-#!/usr/bin/env python
-# encoding: utf-8
-import json
-import sys
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
-# from sklearn.externals.joblib import Memory
 from sklearn.datasets import load_svmlight_file
 from sklearn import svm
-import numpy
+import pandas as pd
+
 
 if __name__ == '__main__':
-    train_X, train_y = load_svmlight_file("feature/train.feature")
-    test_X, test_y = load_svmlight_file("feature/test.feature")
+    paper = pd.read_csv('./data/dataset/Paper.csv')
+    paperIdautherId = pd.read_csv('./data/dataset/PaperAuthor.csv')
 
-    clf = svm.SVC()
-    clf.fit(train_X, train_y)
+    paperId = 1291787
+    year = paper[paper['Id'] == paperId]['Year'].values[0]
+    print(year)
+    # 根据 authorId 找到发表过的所有文章的 paperId
+    # authorId = 1140870
+    # paperIds = paperIdautherId[paperIdautherId['AuthorId'] == int(authorId)]['PaperId'].values
+    # paperYears = []
+    # for id in paperIds:
+    #     year = paper[paper['Id'] == id]['Year'].values[0]
+    #     if 1800 <= year <= 2013:
+    #         paperYears.append(year)
 
-    print(clf.predict(test_X))
-    # numpy.array([1])
+    # print(sum(paperYears) / len(paperYears))
