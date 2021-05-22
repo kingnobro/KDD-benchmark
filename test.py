@@ -3,16 +3,34 @@ from sklearn import svm
 import pandas as pd
 import textdistance
 # import textdistance
+import nltk
+import ssl
+
+
+def download_stopwords():
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+    nltk.download('stopwords')
 
 
 if __name__ == '__main__':
-    train = pd.read_csv('./data/dataset/train_set/train.csv')
-    valid = pd.read_csv('./data/dataset/valid_set/valid.csv')
-    # paperIdautherId = pd.read_csv('./data/dataset/PaperAuthor.csv')
+    download_stopwords()
+    # train = pd.read_csv('./data/dataset/train_set/train.csv')
+    # valid = pd.read_csv('./data/dataset/valid_set/valid.csv')
+    # PaperAuthor = pd.read_csv('./data/dataset/PaperAuthor.csv')
+    # Paper = pd.read_csv('./data/dataset/Paper.csv')
+    # print(Paper[Paper['Id'] == 9].iloc[0])
+    # author1 = set(train['AuthorId'])
+    # author2 = set(valid['AuthorId'])
+    # print(author1.intersection(author2))
+    # paperId = p
 
-    author1 = set(train['AuthorId'])
-    author2 = set(valid['AuthorId'])
-    print(author1.intersection(author2))
+    # paperIds = PaperAuthor[PaperAuthor['AuthorId'] == int(authorId)]['PaperId'].values
+    # kws = get_words(Paper[Paper['Id'] == paperId].iloc[0])
 
     #
     # paperId = 1291787

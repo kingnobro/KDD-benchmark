@@ -57,6 +57,7 @@ if __name__ == "__main__":
         coauthor_2,
         stringDistance_1,
         stringDistance_2,
+        keyword,
         # publication_year,
     ]
 

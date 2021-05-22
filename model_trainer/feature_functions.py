@@ -6,8 +6,10 @@
 # sys.setdefaultencoding('utf-8')
 import util
 import numpy as np
+import pandas as pd
 import textdistance
-
+import nltk
+import re
 
 # 2. coauthor信息
 # 很多论文都有多个作者，根据paperauthor统计每一个作者的top 10（当然可以是top 20或者其他top K）的coauthor，
@@ -15,6 +17,43 @@ import textdistance
 # (1). 可以简单计算top 10 coauthor出现的个数，
 # (2). 还可以算一个得分，每个出现pid论文的top 10 coauthor可以根据他们跟aid作者的合作次数算一个分数，然后累加，
 # 我简单地把coauthor和当前aid作者和合作次数作为这个coauthor出现的得分。
+
+
+def keyword(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+    def get_words(paper):
+        s = str(paper.Title)
+        if not pd.isna(paper.Keyword):
+            s += paper.Keyword
+        # print(s)
+        words = re.split(r'[|\s;,]', s)
+        words = [w for w in words if w and w not in nltk.corpus.stopwords.words('english') and not w.isdigit()]
+        return words
+
+    authorId = AuthorIdPaperId.authorId
+    paperId = AuthorIdPaperId.paperId
+
+    papersOfAuthor = PaperAuthor[PaperAuthor['AuthorId'] == int(authorId)]
+    kws = get_words(Paper[Paper['Id'] == int(paperId)].iloc[0])
+
+    feature = [len(kws)]
+    if papersOfAuthor.shape[0] == 0:
+        feature += [0, 0]
+    else:
+        cnt = 0
+        s = set()
+        for _, row in papersOfAuthor.iterrows():
+            paper = Paper[Paper['Id'] == row.PaperId]
+            if paper.shape[0] == 0:
+                continue
+            paper = paper.iloc[0]
+            _kws = get_words(paper)
+            cnt += len(_kws)
+            if paper.Id != paperId:
+                s.update(_kws)
+        feature.append(cnt / papersOfAuthor.shape[0])
+        feature.append(len(s.intersection(set(kws))))
+
+    return util.get_feature_by_list(feature)
 
 
 def publication_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
