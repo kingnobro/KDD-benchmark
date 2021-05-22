@@ -1,0 +1,6 @@
+.idea/
+data/
+.directory
+feature/
+predict/
+__pycache__/
