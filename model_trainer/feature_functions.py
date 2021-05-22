@@ -6,6 +6,7 @@
 # sys.setdefaultencoding('utf-8')
 import util
 import numpy as np
+import textdistance
 
 
 # 2. coauthor信息
@@ -19,6 +20,7 @@ import numpy as np
 def publication_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
     authorId = AuthorIdPaperId.authorId
     paperId = AuthorIdPaperId.paperId
+    # print('authorId', authorId)
 
     # paperId 的发表年份
     paper_year = Paper[Paper['Id'] == int(paperId)]['Year'].values[0]
@@ -102,11 +104,16 @@ def stringDistance_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_nam
     # 计算 a_name 与 name 的距离
     feat_list.append(len(longest_common_subsequence(a_name, name)))
     feat_list.append(len(longest_common_substring(a_name, name)))
-    feat_list.append(Levenshtein_distance(a_name, name))
+    # feat_list.append(Levenshtein_distance(a_name, name))
+    # feat_list.append(textdistance.Jaccard()(a_name, name))
+    feat_list.append(textdistance.JaroWinkler()(a_name, name))
+
     # 计算 a_aff 与 aff 的距离
     feat_list.append(len(longest_common_subsequence(a_aff, aff)))
     feat_list.append(len(longest_common_substring(a_aff, aff)))
-    feat_list.append(Levenshtein_distance(a_aff, aff))
+    # feat_list.append(Levenshtein_distance(a_aff, aff))
+    # feat_list.append(textdistance.Jaccard()(a_aff, aff))
+    feat_list.append(textdistance.JaroWinkler()(a_aff, aff))
 
     return util.get_feature_by_list(feat_list)
 
@@ -137,7 +144,10 @@ def stringDistance_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_nam
     for _name in name.split("##"):
         lcs_distance.append(len(longest_common_subsequence(a_name, _name)))
         lss_distance.append(len(longest_common_substring(a_name, _name)))
-        lev_distance.append(Levenshtein_distance(a_name, _name))
+        # 尝试不同的字符串相似度算法
+        # lev_distance.append(Levenshtein_distance(a_name, _name))
+        lev_distance.append(textdistance.JaroWinkler()(a_name, _name))
+        # lev_distance.append(textdistance.Jaccard()(a_name, _name))
 
     feat_list += [np.mean(lcs_distance), np.mean(lss_distance), np.mean(lev_distance)]
 
@@ -148,7 +158,10 @@ def stringDistance_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_nam
     for _aff in aff.split("##"):
         lcs_distance.append(len(longest_common_subsequence(a_aff, _aff)))
         lss_distance.append(len(longest_common_substring(a_aff, _aff)))
-        lev_distance.append(Levenshtein_distance(a_aff, _aff))
+        # 尝试不同的字符串相似度算法
+        # lev_distance.append(Levenshtein_distance(a_aff, _aff))
+        lev_distance.append(textdistance.JaroWinkler()(a_aff, _aff))
+        # lev_distance.append(textdistance.Jaccard()(a_aff, _aff))
 
     feat_list += [np.mean(lcs_distance), np.mean(lss_distance), np.mean(lev_distance)]
 
