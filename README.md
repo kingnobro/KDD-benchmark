@@ -8,4 +8,5 @@
 ### ideas
 
 1. Add feature `publication_year`
+2. Try different ways to calculate text similarity. `Jaro Winkler` wins.
 
