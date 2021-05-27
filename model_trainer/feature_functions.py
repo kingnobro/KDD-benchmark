@@ -19,7 +19,34 @@ import re
 # 我简单地把coauthor和当前aid作者和合作次数作为这个coauthor出现的得分。
 
 
-def keyword(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def journal_conference_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
+    paperId = int(AuthorIdPaperId.paperId)
+
+    conferenceId = Paper[Paper['Id'] == paperId]['ConferenceId'].values
+    journalId = Paper[Paper['Id'] == paperId]['JournalId'].values
+    paper_year = int(Paper[Paper['Id'] == int(paperId)]['Year'].values[0])
+
+    feat_list = []
+    if len(conferenceId) == 0 or int(conferenceId[0]) <= 0:
+        feat_list.append(0)
+    else:
+        feat_list.append(int(conferenceId[0]))
+
+    if len(journalId) == 0 or int(journalId[0]) <= 0:
+        feat_list.append(0)
+    else:
+        feat_list.append(int(journalId[0]))
+
+    if 1800 <= paper_year <= 2013:
+        feat_list.append(paper_year)
+    else:
+        feat_list.append(0)
+
+
+    return util.get_feature_by_list(feat_list)
+
+
+def keyword(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     def get_words(paper):
         s = str(paper.Title)
         if not pd.isna(paper.Keyword):
@@ -35,9 +62,9 @@ def keyword(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, Pa
     papersOfAuthor = PaperAuthor[PaperAuthor['AuthorId'] == int(authorId)]
     kws = get_words(Paper[Paper['Id'] == int(paperId)].iloc[0])
 
-    feature = [len(kws)]
+    feature = []
     if papersOfAuthor.shape[0] == 0:
-        feature += [0, 0]
+        feature += [0]
     else:
         cnt = 0
         s = set()
@@ -50,13 +77,12 @@ def keyword(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, Pa
             cnt += len(_kws)
             if paper.Id != paperId:
                 s.update(_kws)
-        feature.append(cnt / papersOfAuthor.shape[0])
         feature.append(len(s.intersection(set(kws))))
 
     return util.get_feature_by_list(feature)
 
 
-def publication_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def publication_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = AuthorIdPaperId.authorId
     paperId = AuthorIdPaperId.paperId
     # print('authorId', authorId)
@@ -84,7 +110,7 @@ def publication_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_nam
 
 
 # 1. 简单计算top 10 coauthor出现的个数
-def coauthor_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def coauthor_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = AuthorIdPaperId.authorId  # int
     paperId = AuthorIdPaperId.paperId  # int
 
@@ -100,7 +126,7 @@ def coauthor_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff,
 
 
 # 2. 还可以算一个得分，每个出现pid论文的top 10 coauthor可以根据他们跟aid作者的合作次数算一个分数，然后累加，
-def coauthor_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def coauthor_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = AuthorIdPaperId.authorId
     paperId = AuthorIdPaperId.paperId
 
@@ -122,7 +148,7 @@ def coauthor_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff,
 
 
 # 1. name-a 与name1##name2##name3的距离，同理affliction-a 和 aff1##aff2##aff3的距离
-def stringDistance_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def stringDistance_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = AuthorIdPaperId.authorId
     paperId = AuthorIdPaperId.paperId
 
@@ -158,7 +184,7 @@ def stringDistance_1(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_nam
 
 
 # 2. name-a分别与name1，name2，name3的距离，然后取平均，同理affliction-a和,aff1，aff2，aff3的平均距离
-def stringDistance_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper):
+def stringDistance_2(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = AuthorIdPaperId.authorId
     paperId = AuthorIdPaperId.paperId
 

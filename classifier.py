@@ -8,6 +8,7 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import GradientBoostingRegressor
 
 
 class Strategy(object):
@@ -170,6 +171,28 @@ class sklearn_RandomForestClassifier(Strategy):
     def __init__(self):
         self.trainer = "skLearn RandomForestClassifier"
         self.clf = RandomForestClassifier()
+        print("Using %s Classifier" % (self.trainer))
+
+    def train_model(self, train_file_path, model_path):
+        train_X, train_y = load_svmlight_file(train_file_path)
+
+        print("==> Train the model ...")
+        self.clf.fit(train_X, train_y)
+
+    def test_model(self, test_file_path, model_path, result_file_path):
+        print("==> Test the model ...")
+        test_X, test_y = load_svmlight_file(test_file_path)
+        pred_y = self.clf.predict(test_X)
+
+        # write prediction to file
+        with open(result_file_path, 'w') as fout:
+            fout.write("\n".join(map(str, map(int, pred_y))))
+
+
+class sklearn_GradientBoostingRegressor(Strategy):
+    def __init__(self):
+        self.trainer = "skLearn GradientBoostingRegressor"
+        self.clf = GradientBoostingRegressor(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0)
         print("Using %s Classifier" % (self.trainer))
 
     def train_model(self, train_file_path, model_path):
