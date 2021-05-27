@@ -19,6 +19,18 @@ import re
 # 我简单地把coauthor和当前aid作者和合作次数作为这个coauthor出现的得分。
 
 
+def journal_count(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
+    authorId = int(AuthorIdPaperId.authorId)
+    paperIds = PaperAuthor[PaperAuthor['AuthorId'] == int(authorId)]['PaperId'].values
+    journalIds = set()
+    for id in paperIds:
+        journalId = Paper[Paper['Id'] == int(id)]['JournalId'].values
+        if len(journalId) > 0:
+            journalIds.add(int(journalId[0]))
+
+    return util.get_feature_by_list([len(journalIds)])
+
+
 def journal_conference_year(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     paperId = int(AuthorIdPaperId.paperId)
 

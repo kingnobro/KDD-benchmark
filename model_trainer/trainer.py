@@ -53,6 +53,7 @@ class Trainer(object):
 if __name__ == "__main__":
     ''' 特征函数列表 '''
     feature_function_list = [
+        # journal_count,
         journal_conference_year,
         coauthor_1,
         coauthor_2,

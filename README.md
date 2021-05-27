@@ -34,7 +34,7 @@ cmd = "/usr/local/bin/python3 evalution.py %s %s" % (gold_file, pred_file)
 
 6. Try classifier `GradientBoostingRegressor`. Result: `0: 44%`, ` 1: 99%`, ` overall: 40%`
 
-    Modify parameters.
+    Modify parameters. Nothing changed.
 
     ```
     n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0
