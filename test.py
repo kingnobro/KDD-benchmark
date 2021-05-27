@@ -5,6 +5,7 @@ import textdistance
 # import textdistance
 import nltk
 import ssl
+import math
 
 
 def download_stopwords():
@@ -18,19 +19,25 @@ def download_stopwords():
 
 
 if __name__ == '__main__':
-    download_stopwords()
+    # download_stopwords()
     # train = pd.read_csv('./data/dataset/train_set/train.csv')
     # valid = pd.read_csv('./data/dataset/valid_set/valid.csv')
-    # PaperAuthor = pd.read_csv('./data/dataset/PaperAuthor.csv')
-    Paper = pd.read_csv('./data/dataset/Paper.csv')
+    PaperAuthor = pd.read_csv('./data/dataset/PaperAuthor.csv')
+    curr_coauthors = list(map(str, PaperAuthor[PaperAuthor["PaperId"] == int(1291787)]["AuthorId"].values))
+    curr_affiliations = list(map(str, PaperAuthor[PaperAuthor["PaperId"] == int(1291787)]["Affiliation"].values))
+    print(curr_affiliations[0] == 'nan')
+
+    print(curr_coauthors)
+    print(curr_affiliations)
+    # Paper = pd.read_csv('./data/dataset/Paper.csv')
     # for index, line in Paper.iterrows():
     #     cid = int(line['ConferenceId'])
     #     jid = int(line['JournalId'])
     #     if cid != 0 and jid != 0:
     #         print(cid, jid)
-    cid = Paper[Paper['Id'] == 1291787]['ConferenceId'].values[0]
-    jid = Paper[Paper['Id'] == 1291787]['JournalId'].values[0]
-    print(cid, jid)
+    # cid = Paper[Paper['Id'] == 1291787]['ConferenceId'].values[0]
+    # jid = Paper[Paper['Id'] == 1291787]['JournalId'].values[0]
+    # print(cid, jid)
     # print(Paper[Paper['Id'] == 9].iloc[0])
     # author1 = set(train['AuthorId'])
     # author2 = set(valid['AuthorId'])

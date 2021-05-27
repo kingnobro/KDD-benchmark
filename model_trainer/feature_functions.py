@@ -19,6 +19,25 @@ import re
 # 我简单地把coauthor和当前aid作者和合作次数作为这个coauthor出现的得分。
 
 
+# count of coauthors with the same affiliation
+def affiliation_count(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
+    authorId = AuthorIdPaperId.authorId
+    paperId = AuthorIdPaperId.paperId
+    # 从PaperAuthor中，根据paperId找coauthor
+    curr_coauthors = list(map(str, PaperAuthor[PaperAuthor["PaperId"] == int(paperId)]["AuthorId"].values))
+    curr_affiliations = list(map(str, PaperAuthor[PaperAuthor["PaperId"] == int(paperId)]["Affiliation"].values))
+    index = 0
+    for author in curr_coauthors:
+        if author == authorId:
+            break
+        index += 1
+    affiliation = curr_affiliations[index]
+    if affiliation == 'nan':
+        return util.get_feature_by_list([0])
+    else:
+        return util.get_feature_by_list([curr_affiliations.count(affiliation)])
+
+
 def journal_count(AuthorIdPaperId, dict_coauthor, dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal):
     authorId = int(AuthorIdPaperId.authorId)
     paperIds = PaperAuthor[PaperAuthor['AuthorId'] == int(authorId)]['PaperId'].values
