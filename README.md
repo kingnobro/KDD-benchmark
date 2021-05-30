@@ -1,5 +1,11 @@
 # KDD_Benchmark
 
+ECNU CS Data Mining, 2021 Spring
+
+### Team Member
+
+`@Zhao Yunxiang`, `@Wei Mingda`, `@Wu Ronghuan`
+
 ### How to run
 
 ```bash
@@ -53,4 +59,5 @@ Finally, we merged different models to generate predictions.
 #### 3. model ensemble
 
 According to the accuracy of various models, we assigned different models with different weights.
+
 
