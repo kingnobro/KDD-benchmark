@@ -53,7 +53,7 @@ class Trainer(object):
 if __name__ == "__main__":
     ''' 特征函数列表 '''
     feature_function_list = [
-        affiliation_count,
+        # affiliation_count,
         # journal_count,
         journal_conference_year,
         coauthor_1,
@@ -67,13 +67,24 @@ if __name__ == "__main__":
 
     ''' 分类器 '''
     # 决策树，NB，等
+    classifiers = []
+    classifiers.append(Classifier(skLearn_DecisionTree()))
+    classifiers.append(Classifier(skLearn_NaiveBayes()))
+    classifiers.append(Classifier(skLearn_svm()))
+    classifiers.append(Classifier(skLearn_lr()))
+    classifiers.append(Classifier(skLearn_KNN()))
+    classifiers.append(Classifier(sklearn_RandomForestClassifier()))
+    classifiers.append(Classifier(skLearn_AdaBoostClassifier()))
+    classifiers.append(Classifier(sklearn_GradientBoostingRegressor()))
+    classifiers.append(Classifier(sklearn_VotingClassifier()))
+    # classifiers.append()
     # classifier = Classifier(skLearn_DecisionTree())
     # classifier = Classifier(skLearn_NaiveBayes())
     # classifier = Classifier(skLearn_svm())
     # classifier = Classifier(skLearn_lr())
     # classifier = Classifier(skLearn_KNN())
     # classifier = Classifier(sklearn_RandomForestClassifier())
-    classifier = Classifier(skLearn_AdaBoostClassifier())
+    # classifier = Classifier(skLearn_AdaBoostClassifier())
     # classifier = Classifier(sklearn_GradientBoostingRegressor())
     # classifier = Classifier(sklearn_VotingClassifier())
 
@@ -86,8 +97,12 @@ if __name__ == "__main__":
     test_result_path = config.TEST_RESULT_PATH
 
     ''' Trainer '''
-    trainer = Trainer(classifier, model_path, feature_function_list, train_feature_path, test_feature_path,
-                      test_result_path)
+    trainers = []
+    for i in range(9):
+        trainers.append(Trainer(classifiers[i], model_path, feature_function_list, train_feature_path, test_feature_path,
+                      test_result_path))
+    # trainer = Trainer(classifier, model_path, feature_function_list, train_feature_path, test_feature_path,
+    #                   test_result_path)
 
     ''' load data '''
     print("loading data...")
@@ -96,10 +111,10 @@ if __name__ == "__main__":
     test_AuthorIdPaperIds = load_test_data(config.TEST_FILE)  # 加载测试数据, 此时是验证集
 
     # coauthor, 共作者数据
-    dict_coauthor = json.load(open(config.COAUTHOR_FILE), encoding="utf-8")
+    dict_coauthor = json.load(open(config.COAUTHOR_FILE)) #, encoding="utf-8")
     # (paperId, AuthorId) --> {"name": "name1##name2", "affiliation": "aff1##aff2"}
     dict_paperIdAuthorId_to_name_aff \
-        = json.load(open(config.PAPERIDAUTHORID_TO_NAME_AND_AFFILIATION_FILE), encoding="utf-8")
+        = json.load(open(config.PAPERIDAUTHORID_TO_NAME_AND_AFFILIATION_FILE))#, encoding="utf-8")
     # 使用pandas加载csv数据
     PaperAuthor = pandas.read_csv(config.PAPERAUTHOR_FILE)  # 加载 PaperAuthor.csv 数据
     Author = pandas.read_csv(config.AUTHOR_FILE)  # 加载 Author.csv 数据
@@ -111,17 +126,28 @@ if __name__ == "__main__":
 
     # 为训练和测试数据，抽取特征，分别生成特征文件
     # test_AuthorIdPaperIds 是待验证/预测的数据
-    trainer.make_feature_file(train_AuthorIdPaperIds, test_AuthorIdPaperIds, dict_coauthor,
+    # 选择任意一个模型进行 make_feature_file 即可, 因为这步操作和具体的模型无关
+    trainers[0].make_feature_file(train_AuthorIdPaperIds, test_AuthorIdPaperIds, dict_coauthor,
                               dict_paperIdAuthorId_to_name_aff, PaperAuthor, Author, Paper, Conference, Journal)
     # 根据训练特征文件，训练模型
-    trainer.train_mode()
-    # 使用训练好的模型，对测试集进行预测
-    trainer.test_model()
-    # 对模型的预测结果，重新进行整理，得到想要的格式的预测结果
-    get_prediction(config.TEST_FEATURE_PATH, config.TEST_RESULT_PATH, config.TEST_PREDICT_PATH)
+    feature_lists = []
+    predict_lists = []
+    for i in range(9):
+        trainers[i].train_mode()
+        trainers[i].test_model()
+        # get_prediction(config.TEST_FEATURE_PATH, config.TEST_RESULT_PATH, config.TEST_PREDICT_PATH)
+        # def get_prediction(test_feature_path, test_result_path, to_file):
+        feature_lists.append([line.strip() for line in open(config.TEST_FEATURE_PATH)])
+        predict_lists.append([line.strip() for line in open(config.TEST_RESULT_PATH)])
+    get_prediction(feature_lists, predict_lists, config.TEST_PREDICT_PATH)
+    # trainer.train_mode()
+    # # 使用训练好的模型，对测试集进行预测
+    # trainer.test_model()
+    # # 对模型的预测结果，重新进行整理，得到想要的格式的预测结果
+    # get_prediction(config.TEST_FEATURE_PATH, config.TEST_RESULT_PATH, config.TEST_PREDICT_PATH)
 
     ''' 评估,（预测 vs 标准答案）'''
-    gold_file = config.GOLD_FILE
-    pred_file = config.TEST_PREDICT_PATH
-    cmd = "/usr/local/bin/python3 evalution.py %s %s" % (gold_file, pred_file)
-    os.system(cmd)
+    # gold_file = config.GOLD_FILE
+    # pred_file = config.TEST_PREDICT_PATH
+    # cmd = "/usr/local/bin/python3 evalution.py %s %s" % (gold_file, pred_file)
+    # os.system(cmd)

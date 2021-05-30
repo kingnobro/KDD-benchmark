@@ -16,7 +16,8 @@ DATASET_PATH = os.path.join(DATA_PATH, "dataset")
 
 # 训练和测试文件（训练阶段用验证数据，测试阶段使用测试数据）
 TRAIN_FILE = os.path.join(DATASET_PATH, "train_set", "Train.csv")
-TEST_FILE = os.path.join(DATASET_PATH, "valid_set", "Valid.csv")
+# TEST_FILE = os.path.join(DATASET_PATH, "valid_set", "Valid.csv")      # 验证集
+TEST_FILE = os.path.join(DATASET_PATH, "test_set", "Test.01.csv")       # 预测集
 GOLD_FILE = os.path.join(DATASET_PATH, "valid_set", "Valid.gold.csv")
 
 # 模型文件

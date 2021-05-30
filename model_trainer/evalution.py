@@ -12,13 +12,48 @@ import config
 from confusion_matrix import Alphabet, ConfusionMatrix
 
 
-# 对模型的预测结果，重新进行整理，得到想要的格式的预测结果
-def get_prediction(test_feature_path, test_result_path, to_file):
-    feature_list = [line.strip() for line in open(test_feature_path)]
-    predict_list = [line.strip() for line in open(test_result_path)]
+# # 对模型的预测结果，重新进行整理，得到想要的格式的预测结果
+# def get_prediction(test_feature_path, test_result_path, to_file):
+#     feature_list = [line.strip() for line in open(test_feature_path)]
+#     predict_list = [line.strip() for line in open(test_result_path)]
 
+#     dict_authorId_to_predict = {}
+#     for feature, predict in zip(feature_list, predict_list):
+#         paperId, authorId = feature.split(" # ")[-1].split(" ")
+#         paperId = int(paperId)
+#         authorId = int(authorId)
+
+#         if authorId not in dict_authorId_to_predict:
+#             dict_authorId_to_predict[authorId] = {}
+#             dict_authorId_to_predict[authorId]["ConfirmedPaperIds"] = []
+#             dict_authorId_to_predict[authorId]["DeletedPaperIds"] = []
+
+#         if predict == "1":
+#             dict_authorId_to_predict[authorId]["ConfirmedPaperIds"].append(paperId)
+#         if predict == "0":
+#             dict_authorId_to_predict[authorId]["DeletedPaperIds"].append(paperId)
+
+#     # to csv
+#     items = sorted(list(dict_authorId_to_predict.items()), key=lambda x: x[0])
+
+#     data = []
+#     for item in items:
+#         AuthorId = item[0]
+#         ConfirmedPaperIds = " ".join(map(str, item[1]["ConfirmedPaperIds"]))
+#         DeletedPaperIds = " ".join(map(str, item[1]["DeletedPaperIds"]))
+
+#         data.append({"AuthorId": AuthorId, "ConfirmedPaperIds": ConfirmedPaperIds, "DeletedPaperIds": DeletedPaperIds})
+
+#     util.write_dict_to_csv(["AuthorId", "ConfirmedPaperIds", "DeletedPaperIds"], data, to_file)
+
+# 对模型的预测结果，重新进行整理，得到想要的格式的预测结果
+def get_prediction(feature_lists, predict_lists, to_file):
     dict_authorId_to_predict = {}
-    for feature, predict in zip(feature_list, predict_list):
+    feature_list = feature_lists[0]
+    for i in range(len(feature_list)):
+        feature = feature_list[i]
+
+        # for feature, predict in zip(feature_list, predict_list):
         paperId, authorId = feature.split(" # ")[-1].split(" ")
         paperId = int(paperId)
         authorId = int(authorId)
@@ -27,10 +62,41 @@ def get_prediction(test_feature_path, test_result_path, to_file):
             dict_authorId_to_predict[authorId] = {}
             dict_authorId_to_predict[authorId]["ConfirmedPaperIds"] = []
             dict_authorId_to_predict[authorId]["DeletedPaperIds"] = []
+        ss = 0
+        for j in range(9):
+            if predict_lists[j][i] == "1":
+                if j == 0:
+                    ss += 4
+                elif j == 1:
+                    ss += 1
+                elif j == 2:
+                    ss += 0
+                elif j == 3:
+                    ss += 2
+                elif j == 4:
+                    ss += 1
+                elif j == 5:
+                    ss += 5
+                elif j == 6:
+                    ss += 5
+                elif j == 7:
+                    ss += 0
+                elif j == 8:
+                    ss += 3
+                # if j==0: ss+=2
+                # elif j==1: ss+=0
+                # elif j==2: ss+=0
+                # elif j==3: ss+=0
+                # elif j==4: ss+=0
+                # elif j==5: ss+=2
+                # elif j==6: ss+=3
+                # elif j==7: ss+=0
+                # elif j==8: ss+=0
 
-        if predict == "1":
+        if ss >= 11:
+            # if ss>=4:
             dict_authorId_to_predict[authorId]["ConfirmedPaperIds"].append(paperId)
-        if predict == "0":
+        else:
             dict_authorId_to_predict[authorId]["DeletedPaperIds"].append(paperId)
 
     # to csv
