@@ -2,6 +2,8 @@
 
 ECNU CS Data Mining, 2021 Spring
 
+✔️ Our work ranked 2 finally. Not bad.
+
 ### Team Member
 
 `@Zhao Yunxiang`, `@Wei Mingda`, `@Wu Ronghuan`
